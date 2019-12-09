@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import Iterable, Optional
 
 from homeassistant.const import (
+    ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -50,10 +51,14 @@ async def _async_reproduce_state(
         )
         return
 
-    # Return if we are already at the right state.
-    if cur_state.state == state.state and all(
-        check_attr_equal(cur_state.attributes, state.attributes, attr)
-        for attr in ATTRIBUTES
+    # Return if we are already at the right, not assumed state.
+    if (
+        cur_state.state == state.state
+        and all(
+            check_attr_equal(cur_state.attributes, state.attributes, attr)
+            for attr in ATTRIBUTES
+        )
+        and not cur_state.attributes.get(ATTR_ASSUMED_STATE)
     ):
         return
 

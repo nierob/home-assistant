@@ -5,6 +5,7 @@ from types import MappingProxyType
 from typing import Iterable, Optional
 
 from homeassistant.const import (
+    ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -87,10 +88,14 @@ async def _async_reproduce_state(
     if any(attr in DEPRECATED_GROUP for attr in state.attributes):
         _LOGGER.warning(DEPRECATION_WARNING)
 
-    # Return if we are already at the right state.
-    if cur_state.state == state.state and all(
-        check_attr_equal(cur_state.attributes, state.attributes, attr)
-        for attr in ATTR_GROUP + COLOR_GROUP
+    # Return if we are already at the right, not assumed state.
+    if (
+        cur_state.state == state.state
+        and all(
+            check_attr_equal(cur_state.attributes, state.attributes, attr)
+            for attr in ATTR_GROUP + COLOR_GROUP
+        )
+        and not cur_state.attributes.get(ATTR_ASSUMED_STATE)
     ):
         return
 

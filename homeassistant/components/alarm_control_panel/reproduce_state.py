@@ -4,6 +4,7 @@ import logging
 from typing import Iterable, Optional
 
 from homeassistant.const import (
+    ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     SERVICE_ALARM_ARM_AWAY,
     SERVICE_ALARM_ARM_CUSTOM_BYPASS,
@@ -51,8 +52,10 @@ async def _async_reproduce_state(
         )
         return
 
-    # Return if we are already at the right state.
-    if cur_state.state == state.state:
+    # Return if we are already at the right, not assumed state.
+    if cur_state.state == state.state and not cur_state.attributes.get(
+        ATTR_ASSUMED_STATE
+    ):
         return
 
     service_data = {ATTR_ENTITY_ID: state.entity_id}

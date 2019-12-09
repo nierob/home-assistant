@@ -10,6 +10,7 @@ from homeassistant.components.cover import (
     ATTR_TILT_POSITION,
 )
 from homeassistant.const import (
+    ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     SERVICE_CLOSE_COVER,
     SERVICE_CLOSE_COVER_TILT,
@@ -48,13 +49,14 @@ async def _async_reproduce_state(
         )
         return
 
-    # Return if we are already at the right state.
+    # Return if we are already at the right, not assumed state.
     if (
         cur_state.state == state.state
         and cur_state.attributes.get(ATTR_CURRENT_POSITION)
         == state.attributes.get(ATTR_CURRENT_POSITION)
         and cur_state.attributes.get(ATTR_CURRENT_TILT_POSITION)
         == state.attributes.get(ATTR_CURRENT_TILT_POSITION)
+        and not cur_state.attributes.get(ATTR_ASSUMED_STATE)
     ):
         return
 

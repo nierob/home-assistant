@@ -4,6 +4,7 @@ import logging
 from typing import Iterable, Optional
 
 from homeassistant.const import (
+    ATTR_ASSUMED_STATE,
     ATTR_ENTITY_ID,
     SERVICE_TURN_OFF,
     SERVICE_TURN_ON,
@@ -56,10 +57,13 @@ async def _async_reproduce_state(
         )
         return
 
-    # Return if we are already at the right state.
-    if cur_state.state == state.state and cur_state.attributes.get(
-        ATTR_FAN_SPEED
-    ) == state.attributes.get(ATTR_FAN_SPEED):
+    # Return if we are already at the right, not assumed state.
+    if (
+        cur_state.state == state.state
+        and cur_state.attributes.get(ATTR_FAN_SPEED)
+        == state.attributes.get(ATTR_FAN_SPEED)
+        and not cur_state.attributes.get(ATTR_ASSUMED_STATE)
+    ):
         return
 
     service_data = {ATTR_ENTITY_ID: state.entity_id}
